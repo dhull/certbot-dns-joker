@@ -1,0 +1,46 @@
+*.pyc
+*.egg-info/
+.eggs/
+build/
+dist*/
+/venv*/
+/kgs/
+/.tox/
+/releases*/
+/log*
+letsencrypt.log
+certbot.log
+
+# coverage
+.coverage
+/htmlcov/
+
+/.vagrant
+
+tags
+
+# editor temporary files
+*~
+*.sw?
+\#*#
+.idea
+.ropeproject
+.vscode
+
+# auth --cert-path --chain-path
+/*.pem
+
+.venv
+
+# pytest cache
+.cache
+.mypy_cache/
+.pytest_cache/
+
+# docker files
+.docker
+
+# certbot tests
+.certbot_test_workspace
+**/assets/pebble*
+**/assets/challtestsrv*
