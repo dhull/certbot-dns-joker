@@ -1,0 +1,18 @@
+#! /bin/sh
+
+# If you need to install other certbot plugins you can do something such as
+# the following.  This is derived from
+# https://hub.docker.com/r/certbot/dns-nsone/dockerfile.
+
+if test $# -gt 0; then
+    # Retrieve Certbot DNS plugin code.
+    wget -O certbot-${CERTBOT_VERSION}.tar.gz https://github.com/certbot/certbot/archive/v${CERTBOT_VERSION}.tar.gz
+    tar xzf certbot-${CERTBOT_VERSION}.tar.gz
+    # Install each named DNS plugin.
+    for plugin_name in "$@"; do
+        echo "installing ${plugin_name}"
+        cp -r certbot-${CERTBOT_VERSION}/certbot-${plugin_name} /opt/certbot/src/certbot-${plugin_name}
+        pip install --constraint /opt/certbot/docker_constraints.txt --no-cache-dir /opt/certbot/src/certbot-${plugin_name}
+    done
+    rm -rf certbot-${CERTBOT_VERSION}.tar.gz certbot-${CERTBOT_VERSION}
+fi

@@ -37,8 +37,8 @@ tags
 .mypy_cache/
 .pytest_cache/
 
-# docker files
-.docker
+# directory used for building docker image
+/docker-context/
 
 # certbot tests
 .certbot_test_workspace

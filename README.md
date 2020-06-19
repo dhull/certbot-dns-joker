@@ -59,3 +59,51 @@ certbot certonly \
   -d example.com -d '*.example.com'
 ```
 
+## Docker
+
+The Makefile has a `docker-image` target to create a certbot docker image with
+the certbot-dns-joker plugin installed.  In addition if you set the
+DOCKER_OTHER_PLUGINS makefile variable to a (space-separated) list of plugins
+those plugins will also be installed.
+
+Once the docker image is built you can run it with a command such as the
+following.
+
+``` bash
+docker run --rm \
+  -v /var/lib/letsencrypt:/var/lib/letsencrypt \
+  -v /etc/letsencrypt:/etc/letsencrypt \
+  -v /var/log/letsencrypt:/var/log/letsencrypt \
+  --cap-drop=all \
+  certbot-joker \
+  certonly \
+  --authenticator certbot-dns-joker:dns-joker \
+  --certbot-dns-joker:dns-joker-propagation-seconds 900 \
+  --certbot-dns-joker:dns-joker-credentials /etc/letsencrypt/secrets/example.com.ini \
+  --no-self-upgrade \
+  --keep-until-expiring --non-interactive --expand \
+  --server https://acme-v02.api.letsencrypt.org/directory \
+  -d example.com -d '*.example.com'
+```
+
+Then you can run a command such as the following from cron to renew your
+certificates.
+
+``` bash
+docker run --rm \
+  -v /var/lib/letsencrypt:/var/lib/letsencrypt \
+  -v /etc/letsencrypt:/etc/letsencrypt \
+  -v /var/log/letsencrypt:/var/log/letsencrypt \
+  --cap-drop=all \
+  certbot-joker \
+  renew
+```
+
+Note that plugins that attempt to do operations outside of the container (such
+as the apache plugin, which wants to run apachectl) will fail.
+
+## Acknowledgments
+
+This plugin is based in large part on Matthias Bilger's
+[certbot-dns-ispconfig](https://github.com/m42e/certbot-dns-ispconfig) plugin
+and the certbot-dns-dnsimple plugin.
