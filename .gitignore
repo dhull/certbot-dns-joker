@@ -40,6 +40,9 @@ tags
 # directory used for building docker image
 /docker-context/
 
+# directory used for building the RPM
+/rpmbuild/
+
 # certbot tests
 .certbot_test_workspace
 **/assets/pebble*

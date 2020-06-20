@@ -23,7 +23,7 @@ file described below.
 ## Installation
 
 ``` bash
-pip install certbot-dns-joker
+pip install dist/certbot_dns_joker-*.whl
 ```
 
 ## Certbot Arguments
@@ -59,7 +59,15 @@ certbot certonly \
   -d example.com -d '*.example.com'
 ```
 
-## Docker
+## Alternate Deployment Methods
+
+### RPM
+
+I have built an RPM for CentOS 8, which is the platform I use.  The Makefile
+has an `rpm` target that builds the RPM, but this has only been tested on
+CentOS 8.
+
+### Docker
 
 The Makefile has a `docker-image` target to create a certbot docker image with
 the certbot-dns-joker plugin installed.  In addition if you set the
