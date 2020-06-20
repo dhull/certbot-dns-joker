@@ -1,4 +1,7 @@
-VERSION=1.0.0.dev0
+BASEDIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+VERSION=$(shell ./extract-meta version src/certbot_dns_joker/__init__.py)
+CERTBOT_DNS_JOKER_TGZ=certbot-dns-joker-$(VERSION).tar.gz
 CERTBOT_DNS_JOKER_WHL=certbot_dns_joker-$(VERSION)-py2.py3-none-any.whl
 DOCKER_OTHER_PLUGINS=apache dns-nsone
 
@@ -11,7 +14,7 @@ venv3/bin/certbot:
 
 check: venv3/bin/certbot
 	source venv3/bin/activate && \
-	python -m unittest tests/dns_joker_test.py
+	python setup.py test
 
 dist: venv3/bin/certbot
 	rm -rf build dist
@@ -29,9 +32,14 @@ docker-image: dist/$(CERTBOT_DNS_JOKER_WHL) Dockerfile
 	rm -rf docker-context
 
 clean:
-	rm -rf build dist docker-context
+	rm -rf build dist docker-context certbot_dns_joker.egg-info
 
 distclean: clean
 	rm -rf venv3
 	find . -name '*~' -exec rm -f {} \;
-	find . -name __pycache__ -exec rm -rf {} \;
+	find . -name __pycache__ -prune -exec rm -rf {} \;
+
+maintainer-clean: distclean
+	rm -rf .eggs .pytest_cache
+
+.PHONY: all check dist docker-image clean distclean maintainer-clean

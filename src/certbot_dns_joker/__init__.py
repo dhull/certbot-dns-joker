@@ -86,3 +86,19 @@ Examples
      -d example.com
 
 """
+
+# The following lines are extracted so they must be of the form:
+# __KEY__ = "VALUE"
+
+__version__ = "1.0.0.dev0"
+
+__title__ = "certbot-dns-joker"
+__description__ = "Joker DNS Authenticator plugin for Certbot"
+__url__ = "https://github.com/dhull/certbot-dns-joker"
+__doc__ = __description__ + " <" + __url__ + ">"
+
+__author__ = "David Hull"
+__email__ = "github@davidhull.org"
+
+__license__ = "Apache 2.0"
+__copyright__ = "Copyright 2020 David Hull"
