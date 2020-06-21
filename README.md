@@ -69,7 +69,9 @@ This project has a PyPI page at <https://pypi.org/project/certbot-dns-joker/>.
 
 I have built an RPM for CentOS 8, which is the platform I use.  The Makefile
 has an `rpm` target that builds the RPM, but this has only been tested on
-CentOS 8.
+CentOS 8.  In addition, the GitHub release contains an SRPM from which is
+should be possible to build a new RPM on other RPM-based Linux distributions,
+but again I have not tested this.
 
 ### Docker
 

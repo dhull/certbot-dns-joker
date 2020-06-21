@@ -90,7 +90,7 @@ Examples
 # The following lines are extracted so they must be of the form:
 # __KEY__ = "VALUE"
 
-__version__ = "1.0.0.dev2"
+__version__ = "1.0.0.dev3"
 
 __title__ = "certbot-dns-joker"
 __description__ = "Joker DNS Authenticator plugin for Certbot"

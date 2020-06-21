@@ -1,0 +1,87 @@
+#! /usr/bin/perl
+
+# This script generates release messages for GitHub releases.  It requires
+# that 'hub' Ihttps://github.com/github/hub) be installed.
+
+use strict;
+use warnings;
+
+scalar(@ARGV) == 2 or die "usage: $0 NAME RELEASE\n";
+my ($name, $release) = @ARGV;
+
+# Get the previous release tag.
+my $prev_release = `hub release -L 1 -f '%T'˚`;
+if ($prev_release ne '') {
+  $prev_release .= '..';
+}
+
+# This is a very simple commit log message parser.  It ignores everything but
+# the first line of each commit message.  Then if that line has the form
+# "feat(scope): description" it adds it to the new features list, and if it has
+# the form "fix(scope): description" it adds it to the fixes list.
+#
+# https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines
+
+use constant {
+  BEFORE_COMMIT_MSG => 0,
+  IN_RELEASE_MSG => 1,
+  IN_OTHER_MSG => 2,
+};
+
+my %section;
+use constant INDENT => 4;
+my $indent = ' ' x 4;
+my $release_msg = '';
+open(my $commits, '-|', 'git', 'log', "$prev_release$release") or die;
+my $state = BEFORE_COMMIT_MSG;
+while (<$commits>) {
+  m/^commit/ and do {
+    if ($release_msg ne '') {
+      unshift(@{$section{release}}, $release_msg);
+      $release_msg = '';
+    }
+    $state = BEFORE_COMMIT_MSG;
+    next;
+  };
+  m/^\S/ and next;
+  $state == BEFORE_COMMIT_MSG and m/^$indent\S/ and do {
+    if (m/^$indent(feat|fix)\([^\)]*\)?:\s*(.*)/) {
+      unshift(@{$section{$1}}, "* $2\n");
+      $state = IN_OTHER_MSG;
+      next;
+    }
+    if (m/^$indent(release):/) {
+      $state = IN_RELEASE_MSG;
+      next;
+    }
+    $state = IN_OTHER_MSG;
+    next;
+  };
+  $state == IN_RELEASE_MSG and m/^$indent/ and do {
+    # Ignore blank lines at beginning of release message.
+    if (m/^\s*$/ and $release_msg eq '') { next; }
+    $release_msg .= substr($_, INDENT);
+    next;
+  };
+}
+
+print "$name $release\n\n";
+
+if (exists($section{release}) > 0) {
+  print map("$_\n", @{$section{release}});
+}
+if (exists($section{feat})) {
+  print "## New Features\n\n", join('', @{$section{feat}}), "\n";
+}
+if (exists($section{fix})) {
+  print "## Fixes\n\n", join('', @{$section{fix}}), "\n";
+}
+
+exit(0);
+
+########################################################################
+
+sub format_change {
+  my ($change) = @_;
+
+}

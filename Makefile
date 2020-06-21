@@ -1,3 +1,5 @@
+# -*- mode:makefile-gmake -*-
+
 BASEDIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 VERSION=$(shell ./packaging/extract-meta version src/certbot_dns_joker/__init__.py)
@@ -51,9 +53,15 @@ docker-image: dist/$(CERTBOT_DNS_JOKER_WHL) packaging/Dockerfile packaging/insta
 	rm -rf docker-context
 
 publish-pypi: venv3/bin/certbot dist/$(CERTBOT_DNS_JOKER_TGZ) dist/$(CERTBOT_DNS_JOKER_WHL)
+	git rev-parse $(VERSION) >/dev/null 2>&1 || { echo "version $(VERSION) not tagged"; exit 1; }
 	source venv3/bin/activate && \
 	pip install --upgrade twine
 	python3 -m twine upload dist/$(CERTBOT_DNS_JOKER_TGZ) dist/$(CERTBOT_DNS_JOKER_WHL)
+
+publish-github: dist/$(CERTBOT_DNS_JOKER_TGZ) dist/$(CERTBOT_DNS_JOKER_WHL) dist/$(CERTBOT_DNS_JOKER_RPM)
+	git rev-parse $(VERSION) >/dev/null 2>&1 || { echo "version $(VERSION) not tagged"; exit 1; }
+	./packaging/format-release-message certbot-dns-joker $(VERSION) | \
+	  hub release create -d -F - $(addprefix -a ,$(wildcard dist/*-$(VERSION)*)) $(VERSION)
 
 clean:
 	rm -rf build dist rpmbuild docker-context certbot_dns_joker.egg-info
