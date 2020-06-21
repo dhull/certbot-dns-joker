@@ -23,7 +23,7 @@ file described below.
 ## Installation
 
 ``` bash
-pip install dist/certbot_dns_joker-*.whl
+pip install certbot-dns-joker
 ```
 
 ## Certbot Arguments
@@ -60,6 +60,10 @@ certbot certonly \
 ```
 
 ## Alternate Deployment Methods
+
+### PyPI
+
+This project has a PyPI page at <https://pypi.org/project/certbot-dns-joker/>.
 
 ### RPM
 

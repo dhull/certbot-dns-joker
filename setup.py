@@ -107,7 +107,12 @@ setup(
     name=NAME,
     version=find_meta('version'),
     description=find_meta('description'),
+    long_description=read('README.md'),
+    long_description_content_type='text/markdown',
     url=find_meta('url'),
+    project_urls={
+        'Issue Tracker': find_meta('issue_tracker'),
+    },
     author=find_meta('author'),
     author_email=find_meta('email'),
     license=find_meta('license'),

@@ -50,6 +50,11 @@ docker-image: dist/$(CERTBOT_DNS_JOKER_WHL) packaging/Dockerfile packaging/insta
 	  docker-context
 	rm -rf docker-context
 
+publish-pypi: venv3/bin/certbot dist/$(CERTBOT_DNS_JOKER_TGZ) dist/$(CERTBOT_DNS_JOKER_WHL)
+	source venv3/bin/activate && \
+	pip install --upgrade twine
+	python3 -m twine upload dist/$(CERTBOT_DNS_JOKER_TGZ) dist/$(CERTBOT_DNS_JOKER_WHL)
+
 clean:
 	rm -rf build dist rpmbuild docker-context certbot_dns_joker.egg-info
 
