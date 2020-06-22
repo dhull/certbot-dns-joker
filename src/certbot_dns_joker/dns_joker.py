@@ -39,21 +39,26 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _setup_credentials(self):
         self.credentials = self._configure_credentials(
-            'credentials', 'Joker credentials INI file', {
+            'credentials', 'Joker credentials INI file',
+            required_variables = {
                 'username': 'domain-specific Joker dyndns username',
                 'password': 'domain-specific Joker dyndns password',
+                # 'domain': 'top-level domain for credentials',
             })
 
     def _perform(self, domain, validation_name, validation):
-        self._get_joker_client().add_txt_record(domain, validation_name, validation)
+        self._get_joker_client(domain).add_txt_record(domain, validation_name, validation)
 
     def _cleanup(self, domain, validation_name, validation):
-        self._get_joker_client().del_txt_record(domain, validation_name, validation)
+        self._get_joker_client(domain).del_txt_record(domain, validation_name, validation)
 
-    def _get_joker_client(self):
+    def _get_joker_client(self, default_domain):
         username = self.credentials.conf('username')
         password = self.credentials.conf('password')
-        return _JokerClient(username, password, self.ttl)
+        domain = self.credentials.conf('domain')
+        if not domain:
+            domain = default_domain
+        return _JokerClient(username, password, domain, self.ttl)
 
 
 class _JokerClient(object):
@@ -81,21 +86,24 @@ class _JokerClient(object):
        'nochg'    : 'No update required; unnecessary attempts to change to the current address are considered abusive',
     }
 
-    def __init__(self, username, password, ttl, endpoint=JOKER_ENDPOINT):
+    def __init__(self, username, password, domain, ttl, endpoint=JOKER_ENDPOINT):
         self.endpoint = endpoint
         self.username = username
         self.password = password
+        self.domain = domain
         self.ttl = ttl
         self.session = requests.Session()
 
-    def add_txt_record(self, domain, record_name, record_content):
+    def add_txt_record(self, cert_domain, record_name, record_content):
         # Documentation for the Joker TXT record API is here:
         # https://joker.com/faq/content/6/496/en/let_s-encrypt-support.html
+
+        # print(f'ADD domain:{cert_domain} record_name:{record_name} endpoint:{self.endpoint}')
 
         # Joker adds the domain to the end of the label of the TXT record that
         # it creates, but the record_name that certbot passed us already has
         # it so we need to remove it before calling the Joker API.
-        dotdomain = '.' + domain
+        dotdomain = '.' + self.domain
         if record_name.endswith(dotdomain):
             record_name = record_name[0:-len(dotdomain)]
 
@@ -104,20 +112,23 @@ class _JokerClient(object):
             data = {
                 'username': self.username,
                 'password': self.password,
-                'zone': domain,
+                'zone': self.domain,
                 'label': record_name,
                 'type': 'TXT',
                 'value': record_content,
                 'ttl': self.ttl,
             })
 
+        # print(f'ADD {r} {r.text}\n  REQ URL: {r.request.url}\n  REQ BODY: {r.request.body}\n')
+
         if r.status_code >= 300:
-            self._handle_http_error(r.text, domain)
+            self._handle_http_error(r.text, record_name, self.domain)
 
     def del_txt_record(self, domain, record_name, record_content):
         self.add_txt_record(domain, record_name, '')
 
-    def _handle_http_error(self, error, domain_name):
+    def _handle_http_error(self, error, record_name, domain_name):
         hint = self.error.get(error)
-        raise errors.PluginError('Error setting TXT record for {0}: {1}.{2}'
-                                 .format(domain_name, error, ' ({0})'.format(hint) if hint else ''))
+        raise errors.PluginError('Error setting {0} TXT record for {1}: {2}.{3}'
+                                 .format(record_name, domain_name, error,
+                                         ' ({0})'.format(hint) if hint else ''))

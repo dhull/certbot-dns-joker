@@ -72,28 +72,39 @@ class AuthenticatorTest(test_util.TempDirTestCase,
 
 
 class JokerClientTest(unittest.TestCase):
-    record_name = "foo"
+    record_name = "_acme-challenge." + DOMAIN
     record_content = "bar"
     record_ttl = 42
 
     def setUp(self):
         from certbot_dns_joker.dns_joker import _JokerClient
 
-        self.client = _JokerClient(FAKE_USERNAME, FAKE_PASSWORD, self.record_ttl, endpoint=MOCK_ENDPOINT)
+        self.client = _JokerClient(FAKE_USERNAME, FAKE_PASSWORD, DOMAIN,
+                                   self.record_ttl, endpoint=MOCK_ENDPOINT)
 
         self.adapter = requests_mock.Adapter()
         self.client.session.mount('mock://', self.adapter)
 
-    def _register_response(self, response='good', additional_matcher=None, **kwargs):
+    def _register_response(self, response='good', subdomain=None, additional_matcher=None, **kwargs):
         def add_matcher(request):
             data = urllib.parse.parse_qs(request.text)
             add_result = True
             if additional_matcher is not None:
                 add_result = additional_matcher(request)
 
+            def submatch(label):
+                if subdomain:
+                    print(f'checking label:{label} subdomain:{subdomain}')
+                    return len(label) > len(subdomain) and label[-len(subdomain)-1:] == '.' + subdomain
+                else:
+                    return True
+
+            # The error message is unhelpful (NoMockAddress) if this fails.
             return (
                 ("username" in data and data["username"] == [FAKE_USERNAME]) and
                 ("password" in data and data["password"] == [FAKE_PASSWORD]) and
+                ("zone" in data and data["zone"] == [DOMAIN]) and
+                ("label" in data and submatch(data["label"][0])) and
                 add_result
             )
 
@@ -126,6 +137,12 @@ class JokerClientTest(unittest.TestCase):
             self.client.add_txt_record(
                 DOMAIN, self.record_name, self.record_content
             )
+
+    def test_add_txt_record_subdomain(self):
+        self._register_response(subdomain='sub')
+        self.client.add_txt_record(
+            'sub.' + DOMAIN, 'challenge.sub.' + DOMAIN, self.record_content
+        )
 
     def test_del_txt_record(self):
         self._register_response()
