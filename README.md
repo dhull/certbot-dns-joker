@@ -46,8 +46,8 @@ You need to create a configuration file on your system (for example
 that you obtained when you enabled DynDNS for your domain.
 
 ``` plain
-certbot_dns_joker:dns_joker:username = USERNAME
-certbot_dns_joker:dns_joker:password = PASSWORD
+certbot_dns_joker:dns_joker_username = USERNAME
+certbot_dns_joker:dns_joker_password = PASSWORD
 ```
 
 ## Example
