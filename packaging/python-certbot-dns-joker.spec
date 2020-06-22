@@ -168,6 +168,7 @@ rm -rf html/.{doctrees,buildinfo}
 %files -n python3-%{pypi_name}
 %license LICENSE.txt
 %doc README.md
+%doc CHANGELOG.md
 %{python3_sitelib}/certbot_dns_joker
 %{python3_sitelib}/certbot_dns_joker-%{version}-py?.?.egg-info
 
@@ -176,5 +177,8 @@ rm -rf html/.{doctrees,buildinfo}
 %endif
 
 %changelog
-* Sat Jun 20 2020 David Hull <github@davidhull.org> - 1.0.0.dev0-1
+* Tue Jun 23 2020 David Hull <github@davidhull.org> 1.1.0
+- Allow getting certificates for subdomains.
+
+* Sun Jun 21 2020 David Hull <github@davidhull.org> - 1.0.0
 - Initial version, packaging derived from python-certbot-dns-dnsimple.
