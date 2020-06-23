@@ -60,7 +60,7 @@ publish-pypi: venv3/bin/certbot dist/$(CERTBOT_DNS_JOKER_TGZ) dist/$(CERTBOT_DNS
 
 publish-github: dist/$(CERTBOT_DNS_JOKER_TGZ) dist/$(CERTBOT_DNS_JOKER_WHL) dist/$(CERTBOT_DNS_JOKER_RPM)
 	git rev-parse $(VERSION) >/dev/null 2>&1 || { echo "version $(VERSION) not tagged"; exit 1; }
-	./packaging/format-release-message certbot-dns-joker $(VERSION) | \
+	./packaging/format-release-message --version $(VERSION) --name certbot-dns-joker release | \
 	  hub release create -d -F - $(addprefix -a ,$(wildcard dist/*-$(VERSION)*)) $(VERSION)
 
 clean:
