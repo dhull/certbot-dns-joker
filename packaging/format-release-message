@@ -179,22 +179,19 @@ use constant {
 sub make_release_message {
   my ($new_version, $name) = @_;
 
-  my $old_version = last_github_version();
-  print STDERR "make_release: found old version $old_version\n" if $debug;
-
-  my $s = "$name $new_version\n\n";
+  my $s = "$name $new_version\n";
 
   # Read the release message from the changelog.
   open(my $ifh, '<', CHANGELOG) or die "open ".CHANGELOG." for read failed: $!\n";
   my $state = BEFORE_CHANGELOG_ENTRY;
   while (<$ifh>) {
     if ($state == BEFORE_CHANGELOG_ENTRY && m/^##\s*Version\s+\Q$new_version\E/) {
-      $s .= $_;
+      # Skip the version line.
       $state = IN_CHANGELOG_ENTRY;
       next;
     }
     if ($state == IN_CHANGELOG_ENTRY) {
-      if (m/^##\s*Version\s+\Q$old_version\E/) {
+      if (m/^##\s*Version\s/) {
         last;
       }
       $s .= $_;
@@ -223,12 +220,6 @@ sub last_changelog_version {
   }
   close($ifh) or die;
   return '';
-}
-
-# Returns the version (release tag) of the most recent GitHub release, or an
-# empty string if there have not been any releases.
-sub last_github_version {
-  return `hub release -L 1 -f '%T'`;
 }
 
 sub find_git_commit {
@@ -330,7 +321,3 @@ Finally create the GitHub release with the B<hub> command.
     git push && git push --tags
     format-release-message --version VERSION --name PROJECT | \
       hub release create -F - VERSION
-
-=head1 EXTERNAL DEPENDENCIES
-
-The L<B<hub>|https://github.com/github/hub> executable be installed.
