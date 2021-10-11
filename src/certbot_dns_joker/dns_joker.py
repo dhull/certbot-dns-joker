@@ -120,7 +120,6 @@ class JokerCredentialsConfiguration(dns_common.CredentialsConfiguration):
 class MultiCredentialsConfiguration():
     def __init__(self, filenames, mapper=lambda x: x):
         self.creds_for = dict ()
-        t = type(filenames)
         if type(filenames) == type(""):
             filenames = [ filenames ]
         for f in filenames:
