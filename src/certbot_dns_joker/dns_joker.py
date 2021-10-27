@@ -3,6 +3,7 @@
 import traceback
 import sys
 from pprint import pprint
+import re
 
 import logging
 
@@ -121,7 +122,7 @@ class MultiCredentialsConfiguration():
     def __init__(self, filenames, mapper=lambda x: x):
         self.creds_for = dict ()
         if type(filenames) == type(""):
-            filenames = [ filenames ]
+            filenames = re.split("'\s*,\s*'", re.sub("(\[')|('\])", "", filenames))
         for f in filenames:
             cc = JokerCredentialsConfiguration(f, mapper)
             self.creds_for [cc.confobj[mapper('domain')]] = cc
