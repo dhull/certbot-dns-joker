@@ -1,8 +1,15 @@
 """DNS Authenticator for DNS servers with the Joker extension to the DynDNS API."""
+
+import traceback
+import sys
+from pprint import pprint
+import re
+
 import logging
 
 import requests
 import zope.interface
+import re
 
 from certbot import errors
 from certbot import interfaces
@@ -24,6 +31,8 @@ class Authenticator(dns_common.DNSAuthenticator):
     description = 'Obtain certificates using a DNS TXT record (if you are using Joker for DNS).'
     ttl = 60
 
+    credentials_map = dict ()
+
     def __init__(self, *args, **kwargs):
         super(Authenticator, self).__init__(*args, **kwargs)
         self.credentials = None
@@ -31,7 +40,7 @@ class Authenticator(dns_common.DNSAuthenticator):
     @classmethod
     def add_parser_arguments(cls, add):  # pylint: disable=arguments-differ
         super(Authenticator, cls).add_parser_arguments(add, default_propagation_seconds=120)
-        add('credentials', help='Joker credentials INI file.')
+        add('credentials', help='Joker credentials INI file.', action='append')
 
     def more_info(self):  # pylint: disable=missing-function-docstring
         return 'This plugin configures a DNS TXT record to respond to a dns-01 challenge using ' + \
@@ -43,7 +52,7 @@ class Authenticator(dns_common.DNSAuthenticator):
             required_variables = {
                 'username': 'domain-specific Joker dyndns username',
                 'password': 'domain-specific Joker dyndns password',
-                # 'domain': 'top-level domain for credentials',
+                'domain':   'top-level domain for credentials',
             })
 
     def _perform(self, domain, validation_name, validation):
@@ -52,13 +61,83 @@ class Authenticator(dns_common.DNSAuthenticator):
     def _cleanup(self, domain, validation_name, validation):
         self._get_joker_client(domain).del_txt_record(domain, validation_name, validation)
 
+
     def _get_joker_client(self, default_domain):
-        username = self.credentials.conf('username')
-        password = self.credentials.conf('password')
-        domain = self.credentials.conf('domain')
-        if not domain:
-            domain = default_domain
-        return _JokerClient(username, password, domain, self.ttl)
+        cc = self.credentials.for_domain(default_domain)
+        try:
+            return _JokerClient(cc.username(), cc.password(), cc.domain(), self.ttl)
+        except:
+            raise Exception(f'domain: {default_domain}: no credentials found. check configuration\n')
+
+    def _configure_credentials(self, key, label, required_variables=None,
+                               validator=None) -> 'MultiCredentialsConfiguration':
+
+        def __validator(filename): # pylint: disable=unused-private-member
+            configuration = CredentialsConfiguration(filename, self.dest)
+
+            if required_variables:
+                configuration.require(required_variables)
+
+            if validator:
+                validator(configuration)
+
+        self._configure_file(key, label, __validator)
+
+        credentials_configuration = MultiCredentialsConfiguration(self.conf(key), self.dest)
+        if required_variables:
+            for cc in credentials_configuration.domains():
+              cc.require(required_variables)
+
+        if validator:
+            for cc in credentials_configuration.domains():
+                validator()
+
+        return credentials_configuration
+
+    def _configure_file(self, key, label, validator=None):
+        configured_value = self.conf(key)
+        if not configured_value:
+            new_value = self._prompt_for_file(label, validator)
+            setattr(self.config, self.dest(key), [os.path.abspath(os.path.expanduser(new_value))])
+
+
+
+class JokerCredentialsConfiguration(dns_common.CredentialsConfiguration):
+    def __init__(self, filename, mapper=lambda x: x):
+        super(JokerCredentialsConfiguration,self).__init__(filename, mapper)
+
+    def username(self):
+        return self.__get('username')
+
+    def password(self):
+        return self.__get('password')
+
+    def domain(self):
+        return self.__get('domain')
+
+    def __get(self, var):
+        return self.confobj [self.mapper(var)]
+
+class MultiCredentialsConfiguration():
+    def __init__(self, filenames, mapper=lambda x: x):
+        self.creds_for = dict ()
+        if type(filenames) == type(""):
+            filenames = re.split("'\s*,\s*'", re.sub("(\[')|('\])", "", filenames))
+        for f in filenames:
+            cc = JokerCredentialsConfiguration(f, mapper)
+            self.creds_for [cc.confobj[mapper('domain')]] = cc
+
+    def domains(self):
+        return self.creds_for.values()
+
+    def for_domain(self, domain):
+        if domain in self.creds_for:
+            return self.creds_for[domain]
+        for name in self.creds_for.keys():
+            m = re.compile(".*\." + name + "")
+            if m.match(domain) != None:
+                return self.creds_for [name]
+
 
 
 class _JokerClient(object):
