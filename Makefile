@@ -5,7 +5,7 @@ BASEDIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 VERSION=$(shell ./packaging/extract-meta version src/certbot_dns_joker/__init__.py)
 CERTBOT_DNS_JOKER_TGZ=certbot-dns-joker-$(VERSION).tar.gz
 CERTBOT_DNS_JOKER_WHL=certbot_dns_joker-$(VERSION)-py2.py3-none-any.whl
-CERTBOT_DNS_JOKER_RPM=python3-certbot-dns-joker-$(VERSION)-1.el8.noarch.rpm
+CERTBOT_DNS_JOKER_RPM=python3-certbot-dns-joker-$(VERSION)-1.el9.noarch.rpm
 CERTBOT_DNS_JOKER_SPEC=python-certbot-dns-joker.spec
 DOCKER_OTHER_PLUGINS=apache dns-nsone
 

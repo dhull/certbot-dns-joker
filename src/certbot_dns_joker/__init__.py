@@ -90,7 +90,7 @@ Examples
 # The following lines are extracted so they must be of the form:
 # __KEY__ = "VALUE"
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 __title__ = "certbot-dns-joker"
 __description__ = "Joker DNS Authenticator plugin for Certbot"
@@ -102,4 +102,4 @@ __email__ = "github@davidhull.org"
 __issue_tracker__ = 'https://github.com/dhull/certbot-dns-joker/issues'
 
 __license__ = "Apache 2.0"
-__copyright__ = "Copyright 2020 David Hull"
+__copyright__ = "Copyright 2022 David Hull"

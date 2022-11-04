@@ -39,8 +39,9 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _setup_credentials(self):
         self.credentials = self._configure_credentials(
-            'credentials', 'Joker credentials INI file',
-            required_variables = {
+            'credentials',
+            'Joker credentials INI file',
+            {
                 'username': 'domain-specific Joker dyndns username',
                 'password': 'domain-specific Joker dyndns password',
                 # 'domain': 'top-level domain for credentials',

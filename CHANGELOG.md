@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.2.0 &mdash; 2022-11-23
+
+Rebuild for certbot-1.30.
+
 ## Version 1.1.0 &mdash; 2020-06-23
 
 Previously certbot-dns-joker only allowed getting certificates at the root

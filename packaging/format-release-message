@@ -10,6 +10,7 @@ use Date::Format;
 use Date::Parse;
 use File::Temp;
 use Getopt::Long;
+use Pod::Usage;
 
 use constant CHANGELOG => 'CHANGELOG.md';
 
@@ -20,7 +21,8 @@ GetOptions(
   'version=s' => \$new_version,
   'name=s' => \$name,
   'debug!' => \$debug,
-) or die;
+  'help' => sub { pod2usage(-verbose => 2, -exitval => 0); },
+) or pod2usage(-exitval => 1);
 
 if (scalar(@ARGV) == 0) {
   my $old_version = last_changelog_version(CHANGELOG);
