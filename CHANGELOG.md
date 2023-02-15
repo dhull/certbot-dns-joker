@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 2.1.0 &mdash; 2023-02-14
+
+Update and rebuild for certbot-2.1.0.
+
 ## Version 1.2.0 &mdash; 2022-11-23
 
 Rebuild for certbot-1.30.

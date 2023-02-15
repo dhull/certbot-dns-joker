@@ -2,7 +2,6 @@
 import logging
 
 import requests
-import zope.interface
 
 from certbot import errors
 from certbot import interfaces
@@ -13,8 +12,6 @@ logger = logging.getLogger(__name__)
 JOKER_ENDPOINT = 'https://svc.joker.com/nic/replace'
 
 
-@zope.interface.implementer(interfaces.IAuthenticator)
-@zope.interface.provider(interfaces.IPluginFactory)
 class Authenticator(dns_common.DNSAuthenticator):
     """DNS Authenticator for Joker.
 

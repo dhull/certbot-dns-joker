@@ -8,7 +8,7 @@
 %endif
 
 Name:           python-%{pypi_name}
-Version:        1.2.0
+Version:        2.1.0
 Release:        1%{?dist}
 Summary:        Joker DNS Authenticator plugin for Certbot
 
@@ -25,12 +25,11 @@ Source0:        certbot-dns-joker-%{version}.tar.gz
 
 BuildArch:      noarch
 
-BuildRequires:  python3-acme >= 1.30.0
-BuildRequires:  python3-certbot >= 1.30.0
+BuildRequires:  python3-acme >= 2.1.0
+BuildRequires:  python3-certbot >= 2.1.0
 BuildRequires:  python3-devel
 BuildRequires:  python3-requests
-BuildRequires:  python3-setuptools >= 41.6.0
-BuildRequires:  python3-zope-interface
+BuildRequires:  python3-setuptools >= 53.0.0
 
 %if %{with docs}
 # Required for documentation
@@ -98,6 +97,9 @@ pwd && ls -l
 %endif
 
 %changelog
+* Tue Feb 14 2023 David Hull <github@davidhull.org> 2.1.0
+- Update for certbot-2.1.0.
+
 * Mon Oct 31 2022 David Hull <github@davidhull.org> 1.2.0
 - Update packaging from python-certbot-dns-dnsimple-1.30.0-1.el9.src.rpm.
 - Rebuild for el9.

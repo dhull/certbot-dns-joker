@@ -9,6 +9,35 @@ from setuptools import find_packages
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+def read(*parts):
+    """
+    Build an absolute path from *parts* and and return the contents of the
+    resulting file.  Assume UTF-8 encoding.
+    """
+    with codecs.open(os.path.join(HERE, *parts), "rb", "utf-8") as f:
+        return f.read()
+
+META_PATH = 'src/certbot_dns_joker/__init__.py'
+META_FILE = read(META_PATH)
+
+def find_meta(meta):
+    """
+    Extract __*meta*__ from META_FILE.
+    """
+    meta_match = re.search(
+        r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=meta),
+        META_FILE, re.M
+    )
+    if meta_match:
+        return meta_match.group(1)
+    raise RuntimeError("Unable to find __{meta}__ string.".format(meta=meta))
+
+
+VERSION = find_meta('version')
+
+########################################################################
 
 class PyTest(TestCommand):
     user_options = []
@@ -28,12 +57,11 @@ class PyTest(TestCommand):
 
 NAME = 'certbot-dns-joker'
 PACKAGES = find_packages(where='src')
-META_PATH = 'src/certbot_dns_joker/__init__.py'
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Plugins',
     'Intended Audience :: System Administrators',
-    'License :: OSI Approved :: BSD License',
+    'License :: OSI Approved :: Apache Software License',
     'Operating System :: POSIX :: Linux',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
@@ -41,6 +69,7 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
     'Topic :: Internet :: WWW/HTTP',
     'Topic :: Security',
     'Topic :: System :: Installation/Setup',
@@ -51,8 +80,8 @@ CLASSIFIERS = [
 # Remember to update local-oldest-requirements.txt when changing the minimum
 # acme/certbot version.
 INSTALL_REQUIRES = [
-    'acme>=1.30.0,<2',
-    'certbot>=1.30.0,<2',
+    f'acme>={VERSION},<3',
+    f'certbot>={VERSION},<3',
     'requests',
     'setuptools',
     'zope.interface',
@@ -75,35 +104,9 @@ DOCS_EXTRAS = [
     'sphinx_rtd_theme',
 ]
 
-########################################################################
-
-HERE = os.path.abspath(os.path.dirname(__file__))
-
-def read(*parts):
-    """
-    Build an absolute path from *parts* and and return the contents of the
-    resulting file.  Assume UTF-8 encoding.
-    """
-    with codecs.open(os.path.join(HERE, *parts), "rb", "utf-8") as f:
-        return f.read()
-
-META_FILE = read(META_PATH)
-
-def find_meta(meta):
-    """
-    Extract __*meta*__ from META_FILE.
-    """
-    meta_match = re.search(
-        r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=meta),
-        META_FILE, re.M
-    )
-    if meta_match:
-        return meta_match.group(1)
-    raise RuntimeError("Unable to find __{meta}__ string.".format(meta=meta))
-
 setup(
     name=NAME,
-    version=find_meta('version'),
+    version=VERSION,
     description=find_meta('description'),
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
