@@ -1,12 +1,19 @@
 # Changelog
 
-## Version 2.1.0 &mdash; 2023-02-14
+## Version 2.1.0 &mdash; 2023-02-15
 
-Update and rebuild for certbot-2.1.0.
+This is version 2.1.0 of certbot-dns-joker because the convention is now that
+a Certbot plugin uses the same version number as the Certbot version it is
+built against.  There are no major changes in this version of
+certbot-dns-joker.
 
-## Version 1.2.0 &mdash; 2022-11-23
+### New Features
 
-Rebuild for certbot-1.30.
+* Updates for Certbot 2.1.0.
+* As a Certbot 2.0.0 change, config variables and names no longer use the
+  `certbot-dns-joker:` prefix.  If upgrading, see the [Upgrading from
+  1.2.0](https://github.com/dhull/certbot-dns-joker/README.md#upgrading-from-120)
+  section of the README.
 
 ## Version 1.1.0 &mdash; 2020-06-23
 
