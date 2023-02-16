@@ -61,8 +61,8 @@ Examples
    :caption: To acquire a certificate for ``example.com``
 
    certbot certonly \\
-     --authenticator certbot-dns-joker:dns-joker \\
-     --certbot-dns-joker:dns-joker-credentials ~/.secrets/certbot/example.com.ini \\
+     --authenticator dns-joker \\
+     --dns-joker-credentials ~/.secrets/certbot/example.com.ini \\
      -d example.com
 
 .. code-block:: bash
@@ -70,8 +70,8 @@ Examples
              ``www.example.com``
 
    certbot certonly \\
-     --authenticator certbot-dns-joker:dns-joker \\
-     --certbot-dns-joker:dns-joker-credentials ~/.secrets/certbot/example.com.ini \\
+     --authenticator dns-joker \\
+     --dns-joker-credentials ~/.secrets/certbot/example.com.ini \\
      -d example.com \\
      -d www.example.com
 
@@ -80,9 +80,9 @@ Examples
              for DNS propagation
 
    certbot certonly \\
-     --authenticator certbot-dns-joker:dns-joker \\
-     --certbot-dns-joker:dns-joker-credentials ~/.secrets/certbot/example.com.ini \\
-     --certbot-dns-joker:dns-joker-propagation-seconds 60 \\
+     --authenticator dns-joker \\
+     --dns-joker-credentials ~/.secrets/certbot/example.com.ini \\
+     --dns-joker-propagation-seconds 60 \\
      -d example.com
 
 """

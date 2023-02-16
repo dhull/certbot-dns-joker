@@ -32,9 +32,9 @@ To use Joker DNS authentication, pass the following arguments on certbot's comma
 
 | Option | Description |
 | --- | --- |
-| `--authenticator certbot-dns-joker:dns-joker` | Select the Joker authenticator plugin. (required) |
-| `--certbot-dns-joker:dns-joker-credentials` _credentials_file_ | Full path to config file containing domain credentials. |
-| `--certbot-dns-joker:dns-joker-propagation-seconds` _delay_ | Delay between setting DNS TXT record and asking the ACME server to verify it. Default: 120 |
+| `--authenticator dns-joker` | Select the Joker authenticator plugin. (required) |
+| `--dns-joker-credentials` _credentials_file_ | Full path to config file containing domain credentials. |
+| `--dns-joker-propagation-seconds` _delay_ | Delay between setting DNS TXT record and asking the ACME server to verify it. Default: 120 |
 
 If you don't supply the credentials file on the certbot command line you will
 be prompted for its location.
@@ -46,17 +46,17 @@ You need to create a configuration file on your system (for example
 that you obtained when you enabled DynDNS for your domain.
 
 ``` plain
-certbot_dns_joker:dns_joker_username = USERNAME
-certbot_dns_joker:dns_joker_password = PASSWORD
-certbot_dns_joker:dns_joker_domain = DOMAIN
+dns_joker_username = USERNAME
+dns_joker_password = PASSWORD
+dns_joker_domain = DOMAIN
 ```
 
 ## Example
 
 ``` bash
 certbot certonly \
-  --authenticator certbot-dns-joker:dns-joker \
-  --certbot-dns-joker:dns-joker-credentials /etc/letsencrypt/secrets/example.com.ini \
+  --authenticator dns-joker \
+  --dns-joker-credentials /etc/letsencrypt/secrets/example.com.ini \
   -d example.com -d '*.example.com'
 ```
 
@@ -92,9 +92,9 @@ docker run --rm \
   --cap-drop=all \
   certbot-joker \
   certonly \
-  --authenticator certbot-dns-joker:dns-joker \
-  --certbot-dns-joker:dns-joker-propagation-seconds 900 \
-  --certbot-dns-joker:dns-joker-credentials /etc/letsencrypt/secrets/example.com.ini \
+  --authenticator dns-joker \
+  --dns-joker-propagation-seconds 900 \
+  --dns-joker-credentials /etc/letsencrypt/secrets/example.com.ini \
   --no-self-upgrade \
   --keep-until-expiring --non-interactive --expand \
   --server https://acme-v02.api.letsencrypt.org/directory \
@@ -116,6 +116,16 @@ docker run --rm \
 
 Note that plugins that attempt to do operations outside of the container (such
 as the apache plugin, which wants to run apachectl) will fail.
+
+## Upgrading from 1.2.0
+
+If you have existing conf files in `/etc/letsencrypt/renewal`, you will need
+to edit them to remove `certbot-dns-joker:` from the `authenticator` and
+credentials lines.
+
+``` bash
+perl -p -i.bak -e 's/certbot-dns-joker://;' /etc/letsencrypt/renewal/*.conf
+```
 
 ## Acknowledgments
 
