@@ -15,7 +15,7 @@ ARG DOCKER_OTHER_PLUGINS
 
 COPY ${CERTBOT_DNS_JOKER_WHL} /tmp
 COPY install-other-plugins /tmp
-RUN pip install --constraint /opt/certbot/docker_constraints.txt --no-cache-dir /tmp/${CERTBOT_DNS_JOKER_WHL} \
+RUN pip install --no-cache-dir /tmp/${CERTBOT_DNS_JOKER_WHL} \
  && rm /tmp/${CERTBOT_DNS_JOKER_WHL} \
  && /tmp/install-other-plugins ${DOCKER_OTHER_PLUGINS} \
  && rm /tmp/install-other-plugins \
