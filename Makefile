@@ -1,4 +1,5 @@
 # -*- mode:makefile-gmake -*-
+SHELL:=/bin/bash
 
 BASEDIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
